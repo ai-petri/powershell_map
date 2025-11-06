@@ -30,17 +30,18 @@ $x = 0
 $y = 0
 $isDown = 0
 $zoom = 2
+$scale = 0.5
 $tileCount = [Math]::Pow(2,$zoom)
    function Fill
     {
         $XX = 0    
-        for($x=0;  $x -lt $canvas.ActualWidth; $x += 256)
+        for($x=0;  $x -lt $canvas.ActualWidth; $x += $scale*256)
         {
             $YY=0
-            for($y=0; $y -lt $canvas.ActualHeight; $y += 256)
+            for($y=0; $y -lt $canvas.ActualHeight; $y += $scale*256)
             {
             
-                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y
+                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
                 $YY++
                 $YY %= $tileCount
 
@@ -99,8 +100,8 @@ $tileCount = [Math]::Pow(2,$zoom)
 
             while($y -lt $bottomEdge)
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y
-                $y += 256
+                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                $y += $scale*256
                 $YY += 1
                 $YY = $YY % $tileCount
             }
@@ -108,7 +109,7 @@ $tileCount = [Math]::Pow(2,$zoom)
 
         if($leftEdge -gt 0)
         {
-            $x = $leftEdge - 256
+            $x = $leftEdge - $scale*256
             $y = $topEdge
 
             $XX = ($rightX - 1 + $tileCount) % $tileCount  # wrap backward
@@ -116,8 +117,8 @@ $tileCount = [Math]::Pow(2,$zoom)
 
             while ($y -lt $bottomEdge) 
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y
-                $y += 256
+                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                $y += $scale*256
                 $YY = ($YY + 1) % $tileCount
             }
         }
@@ -125,15 +126,15 @@ $tileCount = [Math]::Pow(2,$zoom)
         if($topEdge -gt 0)
         {
             $x = $leftEdge
-            $y = $topEdge - 256
+            $y = $topEdge - $scale*256
 
             $XX = $leftX
             $YY = ($topY - 1 + $tileCount) % $tileCount
 
             while ($x -lt $rightEdge) 
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y
-                $x += 256
+                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
         }
@@ -144,12 +145,12 @@ $tileCount = [Math]::Pow(2,$zoom)
             $y = $bottomEdge
 
             $XX = $leftX
-            $YY = ($topY + ($bottomEdge - $topEdge) / 256) % $tileCount
+            $YY = ($topY + ($bottomEdge - $topEdge) / ($scale*256)) % $tileCount
 
             while ($x -lt $rightEdge) 
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y
-                $x += 256
+                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
         }
