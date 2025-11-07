@@ -66,6 +66,8 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
     function Update
     { 
+        if($canvas.Children.Count -eq 0) {return}
+
         $rightEdge = [double]::NegativeInfinity
         $rightX = 0
         $leftEdge = [double]::PositiveInfinity
@@ -108,7 +110,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
         $topEdge = $pixelRanges.top
         $bottomEdge = $pixelRanges.bottom
     
-        if($rightEdge -lt $canvas.ActualWidth)
+        while($rightEdge -lt $canvas.ActualWidth)
         {
             $x = $rightEdge
             $y = $topEdge
@@ -124,15 +126,17 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
                 $YY += 1
                 $YY = $YY % $tileCount
             }
-            $tileRanges.right += 1
+            $rightX = $XX
+            $rightEdge += $scale*256
         }
 
-        if($leftEdge -gt 0)
+        while($leftEdge -gt 0)
         {
             $x = $leftEdge - $scale*256
             $y = $topEdge
 
-            $XX = ($rightX - 1 + $tileCount) % $tileCount  # wrap backward
+            $XX = $leftX - 1
+            if($XX -lt 0){$XX += $tileCount}
             $YY = $topY
 
             while ($y -lt $bottomEdge) 
@@ -141,15 +145,19 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
                 $y += $scale*256
                 $YY = ($YY + 1) % $tileCount
             }
+            $leftX = $XX
+            $leftEdge -= $scale*256
         }
 
-        if($topEdge -gt 0)
+        while($topEdge -gt 0)
         {
             $x = $leftEdge
             $y = $topEdge - $scale*256
 
             $XX = $leftX
-            $YY = ($topY - 1 + $tileCount) % $tileCount
+            $YY = $topY - 1
+            if($YY -lt 0) {$YY += $tileCount}
+
 
             while ($x -lt $rightEdge) 
             {
@@ -157,15 +165,18 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
                 $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
+            $topY = $YY
+            $topEdge -= $scale*256
         }
 
-        if($bottomEdge -lt $canvas.ActualHeight)
+        while($bottomEdge -lt $canvas.ActualHeight)
         {
-                $x = $leftEdge
+            $x = $leftEdge
             $y = $bottomEdge
 
             $XX = $leftX
-            $YY = ($topY + ($bottomEdge - $topEdge) / ($scale*256)) % $tileCount
+            $YY = $bottomY + 1
+            $YY = $YY % $tileCount
 
             while ($x -lt $rightEdge) 
             {
@@ -173,6 +184,8 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
                 $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
+            $bottomY = $YY
+            $bottomEdge += $scale*256
         }
 
     }
