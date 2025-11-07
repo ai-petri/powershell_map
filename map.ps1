@@ -29,40 +29,13 @@ $canvas.Background = [System.Windows.Media.Brushes]::Blue
 $x = 0
 $y = 0
 $isDown = 0
-$zoom = 3
-$scale = 0.5
+$zoom = 2
+$scale = 1
 $tileCount = [Math]::Pow(2,$zoom)
 $tileRanges = @{left=0;right=0;top=0;bottom=0;}
 $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
-   function Fill
-    {
-        $tileRanges.top = 0
-        $tileRanges.left = 0
-        $pixelRanges.top = 0
-        $pixelRanges.left = 0
-        
-        $XX = 0    
-        for($x=0;  $x -lt $canvas.ActualWidth; $x += $scale*256)
-        {
-            $YY=0
-            for($y=0; $y -lt $canvas.ActualHeight; $y += $scale*256)
-            {
-            
-                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
-                $tileRanges.right = $XX
-                $tileRanges.bottom = $YY
-                $pixelRanges.right = $x + $scale*256
-                $pixelRanges.bottom = $y + $scale*256
-                $YY++
-                $YY %= $tileCount
-
-            }
-            $XX++
-            $XX %= $tileCount
-         }
-         
-    }
+   
 
     function Update
     { 
@@ -288,15 +261,7 @@ function addTile
     $canvas.AddChild($image)
 }
 
-$window.Add_Loaded({
-   Fill
-   
-})
 
-$window.Add_StateChanged({
-     $canvas.Children.Clear()
-     Fill
- })
 
 
 
