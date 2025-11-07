@@ -78,8 +78,8 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
         {
             $childLeft = [System.Windows.Controls.Canvas]::GetLeft($child)
             $childTop = [System.Windows.Controls.Canvas]::GetTop($child)       
-            $childRight = $childLeft + $child.ActualWidth
-            $childBottom = $childTop + $child.ActualHeight
+            $childRight = $childLeft + $child.Width
+            $childBottom = $childTop + $child.Height
             if($childRight -gt $rightEdge) {$rightEdge = $childRight; $rightX = $child.Tag.X}
             if($childLeft -lt $leftEdge) {$leftEdge = $childLeft; $leftX = $child.Tag.X}
             if($childTop -lt $topEdge) {$topEdge = $childTop; $topY = $child.Tag.Y}
