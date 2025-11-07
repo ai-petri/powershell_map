@@ -179,15 +179,19 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
     function RemoveTiles
     {
+
        $toRemove = @()
-       $childLeft = [System.Windows.Controls.Canvas]::GetLeft($child)
-       $childTop = [System.Windows.Controls.Canvas]::GetTop($child)
+       foreach($child in $canvas.Children)
+       {
+           $childLeft = [System.Windows.Controls.Canvas]::GetLeft($child)
+           $childTop = [System.Windows.Controls.Canvas]::GetTop($child)
        
-       if(
-           $childLeft -gt $canvas.ActualWidth -or
-           $childTop -gt $canvas.ActualHeight -or
-           $childLeft -lt  -$child.ActualWidth -or
-           $childTop -lt -$child.ActualHeight) {$toRemove += $child}
+           if(
+               $childLeft -gt $canvas.ActualWidth -or
+               $childTop -gt $canvas.ActualHeight -or
+               $childLeft -lt  -$child.ActualWidth -or
+               $childTop -lt -$child.ActualHeight) {$toRemove += $child}
+        }
 
         foreach($child in $toRemove)
         {
@@ -242,6 +246,8 @@ $window.Add_MouseMove({
 
 $window.Add_SizeChanged({
     Update
+    RemoveTiles
+    LoadTiles
 })
 
 
