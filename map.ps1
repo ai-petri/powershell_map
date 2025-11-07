@@ -65,12 +65,6 @@ $tileCount = [Math]::Pow(2,$zoom)
         $bottomY = 0
         foreach($child in $canvas.Children)
         {
-            $prevX = [System.Windows.Controls.Canvas]::GetLeft($child)
-            $prevY = [System.Windows.Controls.Canvas]::GetTop($child)
-
-            [System.Windows.Controls.Canvas]::SetLeft($child, $prevX+$dx)
-            [System.Windows.Controls.Canvas]::SetTop($child, $prevY+$dy)
-
             $childLeft = [System.Windows.Controls.Canvas]::GetLeft($child)
             $childTop = [System.Windows.Controls.Canvas]::GetTop($child)
         
@@ -188,6 +182,15 @@ $window.Add_MouseMove({
     $dy = $currentPos.Y - $y
     $global:x = $currentPos.X
     $global:y = $currentPos.Y
+
+    foreach($child in $canvas.Children)
+    {
+        $prevX = [System.Windows.Controls.Canvas]::GetLeft($child)
+        $prevY = [System.Windows.Controls.Canvas]::GetTop($child)
+
+        [System.Windows.Controls.Canvas]::SetLeft($child, $prevX+$dx)
+        [System.Windows.Controls.Canvas]::SetTop($child, $prevY+$dy)
+    }
 
     Update
     
