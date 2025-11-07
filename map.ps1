@@ -29,11 +29,19 @@ $canvas.Background = [System.Windows.Media.Brushes]::Blue
 $x = 0
 $y = 0
 $isDown = 0
-$zoom = 2
+$zoom = 3
 $scale = 0.5
 $tileCount = [Math]::Pow(2,$zoom)
+$tileRanges = @{left=0;right=0;top=0;bottom=0;}
+$pixelRanges = @{left=0;right=0;top=0;bottom=0;}
+
    function Fill
     {
+        $tileRanges.top = 0
+        $tileRanges.left = 0
+        $pixelRanges.top = 0
+        $pixelRanges.left = 0
+        
         $XX = 0    
         for($x=0;  $x -lt $canvas.ActualWidth; $x += $scale*256)
         {
@@ -42,19 +50,22 @@ $tileCount = [Math]::Pow(2,$zoom)
             {
             
                 addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                $tileRanges.right = $XX
+                $tileRanges.bottom = $YY
+                $pixelRanges.right = $x + $scale*256
+                $pixelRanges.bottom = $y + $scale*256
                 $YY++
                 $YY %= $tileCount
 
             }
-         $XX++
-         $XX %= $tileCount
+            $XX++
+            $XX %= $tileCount
          }
+         
     }
 
     function Update
-    {
-
-        $toRemove = @()  
+    { 
         $rightEdge = [double]::NegativeInfinity
         $rightX = 0
         $leftEdge = [double]::PositiveInfinity
@@ -66,15 +77,7 @@ $tileCount = [Math]::Pow(2,$zoom)
         foreach($child in $canvas.Children)
         {
             $childLeft = [System.Windows.Controls.Canvas]::GetLeft($child)
-            $childTop = [System.Windows.Controls.Canvas]::GetTop($child)
-        
-            if(
-                $childLeft -gt $canvas.ActualWidth -or
-                $childTop -gt $canvas.ActualHeight -or
-                $childLeft -lt  -$child.ActualWidth -or
-                $childTop -lt -$child.ActualHeight) {$toRemove += $child}
-
-        
+            $childTop = [System.Windows.Controls.Canvas]::GetTop($child)       
             $childRight = $childLeft + $child.ActualWidth
             $childBottom = $childTop + $child.ActualHeight
             if($childRight -gt $rightEdge) {$rightEdge = $childRight; $rightX = $child.Tag.X}
@@ -82,6 +85,28 @@ $tileCount = [Math]::Pow(2,$zoom)
             if($childTop -lt $topEdge) {$topEdge = $childTop; $topY = $child.Tag.Y}
             if($childBottom -gt $bottomEdge) {$bottomEdge = $childBottom; $bottomY = $child.Tag.Y}  
         }
+        $tileRanges.right = $rightX
+        $tileRanges.left = $leftX
+        $tileRanges.top = $topY
+        $tileRanges.bottom = $bottomY
+        $pixelRanges.right = $rightEdge
+        $pixelRanges.left = $leftEdge
+        $pixelRanges.top = $topEdge
+        $pixelRanges.bottom =$bottomEdge
+
+    }
+    
+    function LoadTiles
+    {
+        $rightX = $tileRanges.right
+        $leftX = $tileRanges.left
+        $topY = $tileRanges.top
+        $bottomY = $tileRanges.bottom
+
+        $rightEdge = $pixelRanges.right
+        $leftEdge = $pixelRanges.left
+        $topEdge = $pixelRanges.top
+        $bottomEdge = $pixelRanges.bottom
     
         if($rightEdge -lt $canvas.ActualWidth)
         {
@@ -99,6 +124,7 @@ $tileCount = [Math]::Pow(2,$zoom)
                 $YY += 1
                 $YY = $YY % $tileCount
             }
+            $tileRanges.right += 1
         }
 
         if($leftEdge -gt 0)
@@ -149,7 +175,19 @@ $tileCount = [Math]::Pow(2,$zoom)
             }
         }
 
+    }
 
+    function RemoveTiles
+    {
+       $toRemove = @()
+       $childLeft = [System.Windows.Controls.Canvas]::GetLeft($child)
+       $childTop = [System.Windows.Controls.Canvas]::GetTop($child)
+       
+       if(
+           $childLeft -gt $canvas.ActualWidth -or
+           $childTop -gt $canvas.ActualHeight -or
+           $childLeft -lt  -$child.ActualWidth -or
+           $childTop -lt -$child.ActualHeight) {$toRemove += $child}
 
         foreach($child in $toRemove)
         {
@@ -193,6 +231,12 @@ $window.Add_MouseMove({
     }
 
     Update
+    RemoveTiles
+    LoadTiles
+
+
+    
+    
     
 })
 
