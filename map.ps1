@@ -27,8 +27,8 @@ $xaml_reader = New-Object System.Xml.XmlNodeReader $xaml
 
 $canvas.Background = [System.Windows.Media.Brushes]::Blue
 $isDown = 0
-$zoom = 2
-$scale = 1
+$zoom = 4
+$scale = 0.5
 $tileCount = [Math]::Pow(2,$zoom)
 $tileRanges = @{left=0;right=-1;top=0;bottom=-1;}
 $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
@@ -186,16 +186,24 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
     function ResizeTiles
     {
+        param([double]$newScale)
+        
+        if($newScale -lt 0.5) {return}
+
+
         foreach($child in $canvas.Children)
         {
-            $offsetLeft = $pixelRanges.left + $child.Tag.X * $scale * 256
-            $offsetTop = $pixelRanges.top + $child.Tag.Y * $scale * 256
+            $offsetLeft = ([System.Windows.Controls.Canvas]::GetLeft($child) - $canvas.ActualWidth/2)*($newScale/$scale) +$canvas.ActualWidth/2
+
+            $offsetTop = ([System.Windows.Controls.Canvas]::GetTop($child) - $canvas.ActualHeight/2)*($newScale/$scale) +$canvas.ActualHeight/2
 
             [System.Windows.Controls.Canvas]::SetLeft($child, $offsetLeft)
             [System.Windows.Controls.Canvas]::SetTop($child, $offsetTop)
-            $child.Width = $scale * 256
-            $child.Height = $scale * 256
+            $child.Width = $newScale * 256
+            $child.Height = $newScale * 256
         }
+
+        $global:scale = $newScale
 
     }
 
@@ -254,18 +262,7 @@ $window.Add_SizeChanged({
 $canvas.Add_MouseWheel({
     param($sender, $e)
     
-    if($e.Delta -gt 0)
-    {
-        $global:scale += 0.1
-    }
-    else 
-    {
-        if($scale -gt 0.5)
-        {
-            $global:scale -= 0.1
-        }
-    }
-    ResizeTiles
+    ResizeTiles ($scale + 0.1 * $e.Delta / [Math]::Abs($e.Delta))
     Update
     RemoveTiles
     LoadTiles
