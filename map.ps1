@@ -92,7 +92,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while($y -lt $bottomEdge)
             {
-                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} $x $y ($scale*256) ($scale*256)
                 $y += $scale*256
                 $YY += 1
                 $YY = $YY % $tileCount
@@ -112,7 +112,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while ($y -lt $bottomEdge) 
             {
-                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} $x $y ($scale*256) ($scale*256)
                 $y += $scale*256
                 $YY = ($YY + 1) % $tileCount
             }
@@ -132,7 +132,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while ($x -lt $rightEdge) 
             {
-                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} $x $y ($scale*256) ($scale*256)
                 $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
@@ -151,7 +151,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while ($x -lt $rightEdge) 
             {
-                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} $x $y ($scale*256) ($scale*256)
                 $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
@@ -229,10 +229,10 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
         foreach($o in $toAdd)
         {
-            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y} "https://tile.openstreetmap.org/$($o.Z)/$($o.X)/$($o.Y).png" $o.left $o.top $o.width $o.height
-            addTile @{Z=$o.Z; X=$o.X+1; Y=$o.Y} "https://tile.openstreetmap.org/$($o.Z)/$($o.X+1)/$($o.Y).png" ($o.left+$o.width) $o.top $o.width $o.height
-            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y+1} "https://tile.openstreetmap.org/$($o.Z)/$($o.X)/$($o.Y+1).png" $o.left ($o.top+$o.height) $o.width $o.height
-            addTile @{Z=$o.Z; X=$o.X+1; Y=$o.Y+1} "https://tile.openstreetmap.org/$($o.Z)/$($o.X+1)/$($o.Y+1).png" ($o.left+$o.width) ($o.top+$o.height) $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y} $o.left $o.top $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X+1; Y=$o.Y} ($o.left+$o.width) $o.top $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y+1} $o.left ($o.top+$o.height) $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X+1; Y=$o.Y+1} ($o.left+$o.width) ($o.top+$o.height) $o.width $o.height
         }
         foreach($child in $toRemove)
         {
@@ -268,7 +268,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
         }
         foreach($o in  $toAdd)
         {
-            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y} "https://tile.openstreetmap.org/$($o.Z)/$($o.X)/$($o.Y).png" $o.left $o.top $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y} $o.left $o.top $o.width $o.height
         }
         foreach($child in $toRemove)
         {
@@ -357,13 +357,13 @@ function addTile
 {
     param (
         $tag = @{},
-        [string]$url,
+       
         [double]$x=0,
         [double]$y=0,
         [double]$width=256,
         [double]$height=256
     )
-
+    $url = "https://tile.openstreetmap.org/$($tag.Z)/$($tag.X)/$($tag.Y).png"
     [System.Windows.Controls.Image] $image = New-Object System.Windows.Controls.Image
     $image.Source = New-Object System.Windows.Media.Imaging.BitmapImage(New-Object System.Uri($url))
     $image.Width = $width
