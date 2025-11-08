@@ -25,7 +25,7 @@ $xaml_reader = New-Object System.Xml.XmlNodeReader $xaml
 
 [System.Windows.Controls.Canvas]$canvas = $window.FindName("canvas")
 
-$canvas.Background = [System.Windows.Media.Brushes]::Blue
+$canvas.Background = [System.Windows.Media.Brushes]::White
 $isDown = 0
 $zoom = 1
 $scale = 1
