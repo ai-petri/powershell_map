@@ -27,8 +27,8 @@ $xaml_reader = New-Object System.Xml.XmlNodeReader $xaml
 
 $canvas.Background = [System.Windows.Media.Brushes]::Blue
 $isDown = 0
-$zoom = 4
-$scale = 0.5
+$zoom = 1
+$scale = 1
 $tileCount = [Math]::Pow(2,$zoom)
 $tileRanges = @{left=0;right=-1;top=0;bottom=-1;}
 $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
@@ -207,6 +207,42 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
     }
 
+    function ZoomIn
+    {
+        $toRemove = @()
+        $toAdd = @()
+        foreach($child in $canvas.Children)
+        {
+            $toAdd +=
+            @{
+                left = [System.Windows.Controls.Canvas]::GetLeft($child)
+                top = [System.Windows.Controls.Canvas]::GetTop($child)
+                width = $child.Width / 2
+                height = $child.Height / 2
+                Z = $child.Tag.Z + 1
+                X = $child.Tag.X * 2
+                Y = $child.Tag.Y * 2
+             }
+            $toRemove += $child
+        }
+
+        foreach($o in $toAdd)
+        {
+            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y} "https://tile.openstreetmap.org/$($o.Z)/$($o.X)/$($o.Y).png" $o.left $o.top $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X+1; Y=$o.Y} "https://tile.openstreetmap.org/$($o.Z)/$($o.X+1)/$($o.Y).png" ($o.left+$o.width) $o.top $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y+1} "https://tile.openstreetmap.org/$($o.Z)/$($o.X)/$($o.Y+1).png" $o.left ($o.top+$o.height) $o.width $o.height
+            addTile @{Z=$o.Z; X=$o.X+1; Y=$o.Y+1} "https://tile.openstreetmap.org/$($o.Z)/$($o.X+1)/$($o.Y+1).png" ($o.left+$o.width) ($o.top+$o.height) $o.width $o.height
+        }
+        foreach($child in $toRemove)
+        {
+            $canvas.Children.Remove($child)
+        }
+        $global:zoom ++
+        $global:tileCount *=2
+        $global:scale /=2 
+
+    }
+
 $canvas.Add_MouseDown({
     param($sender, $e)
     $pos = $e.GetPosition($canvas)
@@ -261,12 +297,19 @@ $window.Add_SizeChanged({
 
 $canvas.Add_MouseWheel({
     param($sender, $e)
-    
     ResizeTiles ($scale + 0.1 * $e.Delta / [Math]::Abs($e.Delta))
     Update
     RemoveTiles
     LoadTiles
     Update
+    if($scale -gt 2) 
+    {
+        ZoomIn
+        Update
+        RemoveTiles
+        LoadTiles
+        Update
+    }
     
 })
 
