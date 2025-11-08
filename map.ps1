@@ -209,6 +209,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
     function ZoomIn
     {
+        if($zoom -eq 16) {return}
         $toRemove = @()
         $toAdd = @()
         foreach($child in $canvas.Children)
@@ -245,6 +246,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
     function ZoomOut
     {
+        if($zoom -eq 0) {return}
         $toRemove = @()
         $toAdd = @()
         foreach($child in $canvas.Children)
@@ -331,29 +333,22 @@ $window.Add_SizeChanged({
 
 $canvas.Add_MouseWheel({
     param($sender, $e)
-    ResizeTiles ($scale + 0.1 * $e.Delta / [Math]::Abs($e.Delta))
+    $newScale = $scale + 0.1 * $e.Delta / [Math]::Abs($e.Delta)
+    ResizeTiles $newScale
+    if($newScale -gt 2) 
+    {
+        ZoomIn
+    }
+    if($newScale -lt 1)
+    {
+        ZoomOut
+    }
+    
     Update
     RemoveTiles
     LoadTiles
     Update
-    if($scale -gt 2) 
-    {
-        ZoomIn
-        Update
-        RemoveTiles
-        LoadTiles
-        Update
-    }
-    if($scale -lt 1)
-    {
-        ZoomOut
-        Update
-        ResizeTiles 1
-        Update
-        RemoveTiles
-        LoadTiles
-        Update
-    }
+ 
     
 })
 
