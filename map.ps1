@@ -92,7 +92,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while($y -lt $bottomEdge)
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
                 $y += $scale*256
                 $YY += 1
                 $YY = $YY % $tileCount
@@ -112,7 +112,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while ($y -lt $bottomEdge) 
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
                 $y += $scale*256
                 $YY = ($YY + 1) % $tileCount
             }
@@ -132,7 +132,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while ($x -lt $rightEdge) 
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
                 $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
@@ -151,7 +151,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
             while ($x -lt $rightEdge) 
             {
-                addTile @{Z=1;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
+                addTile @{Z=$zoom;X=$XX;Y=$YY} "https://tile.openstreetmap.org/$zoom/$XX/$YY.png" $x $y ($scale*256) ($scale*256)
                 $x += $scale*256
                 $XX = ($XX + 1) % $tileCount
             }
