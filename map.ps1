@@ -188,7 +188,7 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
     {
         param([double]$newScale)
         
-        if($newScale -lt 0.5) {return}
+        #if($newScale -lt 0.5) {return}
 
 
         foreach($child in $canvas.Children)
@@ -241,6 +241,40 @@ $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
         $global:tileCount *=2
         $global:scale /=2 
 
+    }
+
+    function ZoomOut
+    {
+        $toRemove = @()
+        $toAdd = @()
+        foreach($child in $canvas.Children)
+        {
+            $toRemove += $child
+            if(($child.Tag.X % 2 -eq 0) -and ($child.Tag.Y % 2 -eq 0))
+            {
+                $toAdd +=
+                @{
+                    left = [System.Windows.Controls.Canvas]::GetLeft($child)
+                    top = [System.Windows.Controls.Canvas]::GetTop($child)
+                    width = $child.Width * 2
+                    height = $child.Height * 2
+                    Z =  $child.Tag.Z - 1
+                    X = $child.Tag.X / 2
+                    Y = $child.Tag.Y / 2
+                }
+            }
+        }
+        foreach($o in  $toAdd)
+        {
+            addTile @{Z=$o.Z; X=$o.X; Y=$o.Y} "https://tile.openstreetmap.org/$($o.Z)/$($o.X)/$($o.Y).png" $o.left $o.top $o.width $o.height
+        }
+        foreach($child in $toRemove)
+        {
+            $canvas.Children.Remove($child)
+        }
+        $global:zoom--
+        $global:tileCount /= 2
+        $global:scale *= 2
     }
 
 $canvas.Add_MouseDown({
@@ -305,6 +339,16 @@ $canvas.Add_MouseWheel({
     if($scale -gt 2) 
     {
         ZoomIn
+        Update
+        RemoveTiles
+        LoadTiles
+        Update
+    }
+    if($scale -lt 1)
+    {
+        ZoomOut
+        Update
+        ResizeTiles 1
         Update
         RemoveTiles
         LoadTiles
