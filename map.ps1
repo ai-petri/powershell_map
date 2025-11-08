@@ -269,6 +269,7 @@ $canvas.Add_MouseWheel({
     Update
     RemoveTiles
     LoadTiles
+    Update
     
 })
 
