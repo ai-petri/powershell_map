@@ -235,7 +235,7 @@ $window.Add_MouseMove({
     Update
     RemoveTiles
     LoadTiles
-
+    Update
 
     
     
