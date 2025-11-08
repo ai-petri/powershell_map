@@ -33,7 +33,8 @@ $tileCount = [Math]::Pow(2,$zoom)
 $tileRanges = @{left=0;right=-1;top=0;bottom=-1;}
 $pixelRanges = @{left=0;right=0;top=0;bottom=0;}
 
-   
+$tileSource = @{url="https://tile.openstreetmap.org/{z}/{x}/{y}.png";type="XYZ"}
+
 
     function Update
     { 
@@ -363,7 +364,26 @@ function addTile
         [double]$width=256,
         [double]$height=256
     )
-    $url = "https://tile.openstreetmap.org/$($tag.Z)/$($tag.X)/$($tag.Y).png"
+    $url = ""
+
+    if($tileSource.type -eq "XYZ")
+    {
+        $url = $tileSource.url -replace "{x}", $tag.X -replace "{y}", $tag.Y -replace "{z}", $tag.Z 
+    }
+    if($tileSource.type -eq "Quad")
+    {
+        $key = ""
+        for($i=$tag.Z; $i -gt 0; $i--)
+        {
+            $mask = 1 -shl ($i-1)
+            $digit = 0
+            if(($tag.X -band $mask) -ne 0){$digit+=1}
+            if(($tag.Y -band $mask) -ne 0){$digit+=2}
+            $key += $digit
+        }
+        $url = $tileSource.url -replace "{key}", $key
+    }
+
     [System.Windows.Controls.Image] $image = New-Object System.Windows.Controls.Image
     $image.Source = New-Object System.Windows.Media.Imaging.BitmapImage(New-Object System.Uri($url))
     $image.Width = $width
