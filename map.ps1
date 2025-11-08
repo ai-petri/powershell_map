@@ -26,10 +26,8 @@ $xaml_reader = New-Object System.Xml.XmlNodeReader $xaml
 [System.Windows.Controls.Canvas]$canvas = $window.FindName("canvas")
 
 $canvas.Background = [System.Windows.Media.Brushes]::Blue
-$x = 0
-$y = 0
 $isDown = 0
-$zoom = 2
+$zoom = 3
 $scale = 1
 $tileCount = [Math]::Pow(2,$zoom)
 $tileRanges = @{left=0;right=0;top=0;bottom=0;}
